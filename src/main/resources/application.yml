@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: state-machine
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: sa
+  jpa:
+    open-in-view: true
