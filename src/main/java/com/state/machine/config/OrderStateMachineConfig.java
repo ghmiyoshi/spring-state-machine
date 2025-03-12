@@ -7,7 +7,6 @@ import com.state.machine.states.OrderStates;
 import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -43,11 +42,14 @@ public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<Order
                 .withExternal().source(OrderStates.CREATED).target(OrderStates.CREATED).event(OrderEvents.CREATE)
                 .action(createOrderAction())
                 .and()
-                .withExternal().source(OrderStates.CREATED).target(OrderStates.SHIPPED).event(OrderEvents.SHIP)
-                .action(shipOrderAction())
+                .withExternal().source(OrderStates.CREATED).target(OrderStates.PAID).event(OrderEvents.PAY)
+                .action(payOrderAction())
                 .and()
                 .withExternal().source(OrderStates.CREATED).target(OrderStates.CANCELLED).event(OrderEvents.CANCEL)
                 .action(cancelOrderAction())
+                .and()
+                .withExternal().source(OrderStates.PAID).target(OrderStates.SHIPPED).event(OrderEvents.SHIP)
+                .action(shipOrderAction())
                 .and()
                 .withExternal().source(OrderStates.SHIPPED).target(OrderStates.DELIVERED).event(OrderEvents.DELIVER)
                 .action(deliverOrderAction())
@@ -55,39 +57,33 @@ public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<Order
                 .withExternal().source(OrderStates.SHIPPED).target(OrderStates.CANCELLED).event(OrderEvents.CANCEL)
                 .action(cancelOrderAction())
                 .and()
-                .withExternal().source(OrderStates.DELIVERED).target(OrderStates.PAID).event(OrderEvents.PAY)
-                .action(payOrderAction())
-                .and()
-                .withExternal().source(OrderStates.PAID).target(OrderStates.COMPLETED).event(OrderEvents.COMPLETE)
+                .withExternal().source(OrderStates.DELIVERED).target(OrderStates.COMPLETED).event(OrderEvents.PAY)
                 .action(completeOrderAction());
     }
 
-    public Action<OrderStates, OrderEvents> completeOrderAction() {
+    private Action<OrderStates, OrderEvents> completeOrderAction() {
         return context -> log.info("Action: Completing order");
     }
 
-    public Action<OrderStates, OrderEvents> deliverOrderAction() {
+    private Action<OrderStates, OrderEvents> deliverOrderAction() {
         return context -> log.info("Action: Delivering order");
     }
 
-    public Action<OrderStates, OrderEvents> shipOrderAction() {
+    private Action<OrderStates, OrderEvents> shipOrderAction() {
         return context -> log.info("Action: Shipping order");
     }
 
-    public Action<OrderStates, OrderEvents> cancelOrderAction() {
+    private Action<OrderStates, OrderEvents> cancelOrderAction() {
         return context -> log.info("Action: Cancelling order");
 
     }
 
-    public Action<OrderStates, OrderEvents> payOrderAction() {
+    private Action<OrderStates, OrderEvents> payOrderAction() {
         return context -> log.info("Action: Paying for order");
     }
 
-    public Action<OrderStates, OrderEvents> createOrderAction() {
-        return context -> {
-            log.info("Action: Validating payment and origin");
-            // throw new RuntimeException("Invalid payment method");
-        };
+    private Action<OrderStates, OrderEvents> createOrderAction() {
+        return context ->  log.info("Action: Validating payment");
     }
 
     @Override

@@ -77,6 +77,7 @@ public class OrderService {
         if (DENIED.equals(result.getResultType())) {
             log.info("Transition denied for event: {} in state: {}",
                     event, stateMachine.getState().getId());
+            throw new IllegalStateException("Transition denied");
         }
     }
 
